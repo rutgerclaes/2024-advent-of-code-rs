@@ -1,0 +1,9 @@
+[package]
+name = "day_01"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+err-into = "1.0.1"
+itertools = "0.13.0"
+utils = { path = "../utils" }
