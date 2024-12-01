@@ -6,13 +6,25 @@ use utils::prelude::*;
 
 fn main() -> Result<()> {
     let pairs: Vec<(i32, i32)> = parse_input(&read_input()?)?;
-    let (mut a, mut b): (Vec<i32>, Vec<i32>) = pairs.into_iter().unzip();
-    a.sort();
-    b.sort();
-    let part_1: i32 = a.iter().zip(b).map(|(a, b)| (a - b).abs()).sum();
-    println!("Solution to Part 1: {}", part_1);
+    println!("Solution to Part 1: {}", part_one(&pairs));
+    println!("Solution to Part 2: {}", part_two(&pairs));
 
     Ok(())
+}
+
+fn part_one(pairs: &[(i32, i32)]) -> i32 {
+    let (mut a, mut b): (Vec<i32>, Vec<i32>) = pairs.iter().copied().unzip();
+    a.sort();
+    b.sort();
+    a.iter().zip(b).map(|(a, b)| (a - b).abs()).sum()
+}
+
+fn part_two(pairs: &[(i32, i32)]) -> i32 {
+    let (a, b): (Vec<i32>, Vec<i32>) = pairs.iter().copied().unzip();
+    let counts = b.iter().counts();
+    a.iter()
+        .map(|a| a * *counts.get(a).unwrap_or(&0) as i32)
+        .sum()
 }
 
 fn read_input() -> Result<String> {
