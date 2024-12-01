@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-err-into = "1.0.1"
-itertools = "0.13.0"
 utils = { path = "../utils" }
+itertools = { workspace = true }
+tracing = { workspace = true }
