@@ -4,9 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-thiserror = "1.0.41"
-err-into = { workspace = true}
-tracing = { workspace = true}
-time = { workspace = true}
-tracing-subscriber = { workspace = true}
 console = "0.15.8"
+err-into = { workspace = true}
+itertools = { workspace = true}
+thiserror = "1.0.41"
+time = { workspace = true}
+tracing = { workspace = true}
+tracing-subscriber = { workspace = true}

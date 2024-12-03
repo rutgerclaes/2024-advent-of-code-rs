@@ -1,8 +1,13 @@
-use crate::error::Result;
+use crate::error::{Error, Result};
 use err_into::ErrorInto;
-use std::io::Read;
+use itertools::Itertools;
+use std::result::Result as StdResult;
+use std::{
+    io::{self, Read},
+    str::FromStr,
+};
 
-pub fn read_input() -> Result<String> {
+pub fn read_input() -> StdResult<String, io::Error> {
     let input = match std::env::args().nth(1) {
         Some(file) if file != "-" => {
             tracing::debug!(file = file, "Reading input from file");
@@ -29,4 +34,22 @@ pub fn read_input() -> Result<String> {
     }
 
     input
+}
+
+pub fn read_lines<I>() -> StdResult<I, io::Error>
+where
+    I: FromIterator<String>,
+{
+    read_input().map(|input| input.lines().map(str::to_string).collect())
+}
+
+pub fn parse_lines<T, I>() -> Result<I>
+where
+    T: FromStr,
+    I: FromIterator<T>,
+    T::Err: Into<Error>,
+{
+    read_input()
+        .err_into()
+        .and_then(|input| input.lines().map(|l| l.parse().err_into()).try_collect())
 }
