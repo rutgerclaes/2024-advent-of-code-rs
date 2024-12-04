@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-  'day_01', 'day_02', 'utils',
+  'day_01', 'day_02', 'day_03', 'day_04', 'utils',
 ]
 
 [workspace.dependencies]
