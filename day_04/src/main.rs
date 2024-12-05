@@ -11,7 +11,7 @@ fn main() -> Result<()> {
     let input = read_input()?;
     let grid = LetterGrid::new( &input );
     print_part_1(part_one(&grid));
-    print_part_2(part_two(&input));
+    print_part_2(part_two(&grid));
 
     Ok(())
 }
@@ -22,9 +22,8 @@ fn part_one(grid: &LetterGrid) -> StdResult<usize, Infallible> {
     Ok( grid.count_word( &word ) )
 }
 
-#[tracing::instrument(level=Level::DEBUG,skip(input))]
-fn part_two(input: &str) -> StdResult<usize, Infallible> {
-    let grid = LetterGrid::new( input );
+#[tracing::instrument(level=Level::DEBUG,skip(grid))]
+fn part_two(grid: &LetterGrid) -> StdResult<usize, Infallible> {
     Ok( grid.count_crosses())
 }
 
