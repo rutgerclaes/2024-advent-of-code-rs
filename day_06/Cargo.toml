@@ -8,4 +8,3 @@ utils = { path = "../utils" }
 itertools = { workspace = true }
 tracing = { workspace = true }
 tramp = "0.3.0"
-im = "15.1.0"

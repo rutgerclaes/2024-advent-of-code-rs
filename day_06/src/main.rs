@@ -71,7 +71,7 @@ fn part_one(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
     Ok(tramp(take_step(map, position, direction, visited)))
 }
 
-#[tracing::instrument(level=Level::DEBUG,skip(map))]
+#[tracing::instrument(level=Level::DEBUG,skip(map,starting_point))]
 fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
     
     #[inline]
