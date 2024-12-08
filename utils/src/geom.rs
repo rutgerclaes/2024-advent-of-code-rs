@@ -1,7 +1,7 @@
 use std::{collections::HashMap, hash::Hash, str::FromStr};
 use itertools::Itertools;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub struct Point<T>{
     pub x: T,
     pub y: T,
@@ -10,6 +10,18 @@ pub struct Point<T>{
 impl<T> Point<T> {
     pub fn new(x: T, y: T) -> Self {
         Point { x, y }
+    }
+}
+
+impl<T> From<(T,T)> for Point<T> {
+    fn from((x,y): (T,T)) -> Self {
+        Point { x, y }
+    }
+}
+
+impl <T> Into<(T,T)> for Point<T> {
+    fn into(self) -> (T,T) {
+        (self.x, self.y)
     }
 }
 
@@ -28,6 +40,10 @@ where
 
     pub fn step(&self, direction: &Direction) -> Self where T: num::traits::Zero + num::traits::One + num::traits::Signed {
         let (dx, dy) = direction.d();
+        Point::new(self.x.add(dx), self.y.add(dy))
+    }
+
+    pub fn move_by(&self, dx: T, dy: T) -> Self {
         Point::new(self.x.add(dx), self.y.add(dy))
     }
 }
@@ -109,6 +125,7 @@ impl Direction {
 
 }
 
+#[derive(Debug, Clone)]
 pub struct BBox<T> {
     pub min_x: T,
     pub max_x: T,
@@ -158,6 +175,15 @@ where
             && point.x <= self.max_x
             && point.y >= self.min_y
             && point.y <= self.max_y
+    }
+
+    #[inline]
+    pub fn filter(&self, point: Point<T>) -> Option<Point<T>> {
+        if self.contains(&point) {
+            Some(point)
+        } else {
+            None
+        }
     }
 
     #[inline]
