@@ -44,7 +44,7 @@ impl Report {
                     b
                 );
 
-                if abs_diff < 1 || abs_diff > 3 {
+                if !(1..=3).contains(&abs_diff) {
                     tracing::trace!(
                         distance = abs_diff,
                         "unsafe: distance between {} and {} is too large",

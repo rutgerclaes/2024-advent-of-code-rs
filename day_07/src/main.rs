@@ -101,7 +101,7 @@ impl Operator {
         match self {
             Self::Plus => a + b,
             Self::Times => a * b,
-            Self::Concat => a * 10u64.pow(b.ilog10() as u32 + 1) + b,
+            Self::Concat => a * 10u64.pow(b.ilog10() + 1) + b,
         }
     }
 }

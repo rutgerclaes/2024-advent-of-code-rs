@@ -68,11 +68,11 @@ fn part_two(stations: &HashMap<char, Vec<Point<i32>>>, bbox: &BBox<i32>) -> Resu
                 .combinations(2)
                 .filter_map(|a| a.into_iter().collect_tuple())
                 .flat_map(|(a, b)| [(a, b), (b, a)])
-                .flat_map(|(a, b)| {
+                .flat_map(|(a, &b)| {
                     let dx = b.x - a.x;
                     let dy = b.y - a.y;
 
-                    std::iter::successors(Some(b.clone()), move |p| bbox.filter(p.move_by(dx, dy)))
+                    std::iter::successors(Some(b), move |p| bbox.filter(p.move_by(dx, dy)))
                 })
                 .collect::<HashSet<_>>()
         })

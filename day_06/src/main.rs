@@ -31,7 +31,7 @@ fn main() -> Result<()> {
     let starting_point = (Direction::Up, location);
     let map: Map = input.parse()?;
 
-    print_part_1(part_one(&map, starting_point.clone()));
+    print_part_1(part_one(&map, starting_point));
     print_part_2(part_two(&map, starting_point));
 
     Ok(())
@@ -54,7 +54,7 @@ fn part_one(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
                 rec_call!(take_step(map, position, direction, visited))
             }
             Some(Location::Empty) => {
-                visited.insert(next_position.clone());
+                visited.insert(next_position);
                 tracing::debug!("moving to {:?}, now visited {:?}", next_position, visited);
                 rec_call!(take_step(map, next_position, direction, visited))
             }
@@ -67,7 +67,7 @@ fn part_one(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
 
     let (direction, position) = starting_point;
     let mut visited = HashSet::new();
-    visited.insert(position.clone());
+    visited.insert(position);
     Ok(tramp(take_step(map, position, direction, visited)))
 }
 
@@ -82,7 +82,7 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
         if let Some(d) = visited.get_mut(&position) {
             d.insert(direction);
         } else {
-            visited.insert(position.clone(), [direction].iter().cloned().collect());
+            visited.insert(position, [direction].iter().cloned().collect());
         }
     }
 
@@ -106,7 +106,7 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
             Some(Location::Obstacle) => {
                 tracing::debug!("obstacle at {:?}, turning right", next_position);
                 let next_direction = direction.turn_right();
-                update_visited(&mut visited, position.clone(), direction);
+                update_visited(&mut visited, position, direction);
 
                 rec_call!(take_step(
                     map,
@@ -136,19 +136,19 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
                 {
                     let loops: Option<usize> = tramp(take_step(
                         map,
-                        Some(next_position.clone()),
-                        position.clone(),
+                        Some(next_position),
+                        position,
                         direction.turn_right(),
                         visited.clone(),
                         modifications.clone(),
                     ));
                     if loops.is_none() {
                         tracing::info!("inserting 'O' at {:?}", next_position);
-                        modifications.insert(next_position.clone());
+                        modifications.insert(next_position);
                     }
                 }
 
-                update_visited(&mut visited, next_position.clone(), direction);
+                update_visited(&mut visited, next_position, direction);
 
                 tracing::debug!("moving to {:?}, now visited {:?}", next_position, visited);
                 rec_call!(take_step(
@@ -169,7 +169,7 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
 
     let (direction, position) = starting_point;
     let mut visited = HashMap::new();
-    visited.insert(position.clone(), [direction].iter().cloned().collect());
+    visited.insert(position, [direction].iter().cloned().collect());
     tramp(take_step(
         map,
         None,
@@ -197,12 +197,6 @@ impl Display for Location {
             Location::Empty => write!(f, "."),
             Location::Obstacle => write!(f, "#"),
         }
-    }
-}
-
-impl Default for Location {
-    fn default() -> Self {
-        Location::Empty
     }
 }
 

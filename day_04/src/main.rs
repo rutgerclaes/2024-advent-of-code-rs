@@ -1,7 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use std::convert::Infallible;
 use std::result::Result as StdResult;
-use std::usize;
 use tracing::Level;
 use utils::prelude::*;
 
@@ -29,7 +28,7 @@ fn part_two(grid: &LetterGrid) -> StdResult<usize, Infallible> {
 
 #[allow(unused)]
 fn print_xmas(grid: &LetterGrid, word: &[char; 4]) {
-    let positions = grid.find_word::<4, Vec<_>>(&word);
+    let positions = grid.find_word::<4, Vec<_>>(word);
 
     let check: HashSet<_> = positions.iter().flatten().collect();
     let xmas_chars: HashMap<_, _> = grid
@@ -185,7 +184,7 @@ impl LetterGrid {
             up, down, left, right, up_left, up_right, down_left, down_right,
         ]
         .into_iter()
-        .filter_map(|x| x)
+        .flatten()
         .collect()
     }
 
