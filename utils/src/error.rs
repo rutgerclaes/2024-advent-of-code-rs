@@ -9,7 +9,7 @@ pub enum Error {
     Parse(String, #[source] Option<Box<dyn std::error::Error>>),
 
     #[error("Solution not found: {0}")]
-    SolutionNotFound( String )
+    SolutionNotFound(String),
 }
 
 pub fn parse_error(msg: &str, line: &str) -> Error {

@@ -73,13 +73,16 @@ fn part_one(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
 
 #[tracing::instrument(level=Level::DEBUG,skip(map,starting_point))]
 fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
-    
     #[inline]
-    fn update_visited( visited: &mut HashMap<Point,HashSet<Direction>>, position: Point, direction: Direction ) {
-        if let Some( d ) = visited.get_mut( &position ) {
-            d.insert( direction );
+    fn update_visited(
+        visited: &mut HashMap<Point, HashSet<Direction>>,
+        position: Point,
+        direction: Direction,
+    ) {
+        if let Some(d) = visited.get_mut(&position) {
+            d.insert(direction);
         } else {
-            visited.insert( position.clone(), [direction].iter().cloned().collect() );
+            visited.insert(position.clone(), [direction].iter().cloned().collect());
         }
     }
 
@@ -88,7 +91,7 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
         addition: Option<Point>,
         position: Point,
         direction: Direction,
-        mut visited: HashMap<Point,HashSet<Direction>>,
+        mut visited: HashMap<Point, HashSet<Direction>>,
         mut modifications: HashSet<Point>,
     ) -> BorrowRec<Option<usize>> {
         let next_position = position.step(&direction);
@@ -114,7 +117,11 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
                     modifications
                 ))
             }
-            Some(Location::Empty) if visited.get( &next_position ).map_or( false, |set| set.contains( &direction ) ) => {
+            Some(Location::Empty)
+                if visited
+                    .get(&next_position)
+                    .map_or(false, |set| set.contains(&direction)) =>
+            {
                 tracing::debug!(
                     "already visited {:?} in {:?} direction",
                     next_position,
@@ -123,7 +130,10 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
                 rec_ret!(None)
             }
             Some(Location::Empty) => {
-                if addition.is_none() && !modifications.contains(&next_position) && !visited.contains_key( &next_position ) {
+                if addition.is_none()
+                    && !modifications.contains(&next_position)
+                    && !visited.contains_key(&next_position)
+                {
                     let loops: Option<usize> = tramp(take_step(
                         map,
                         Some(next_position.clone()),
