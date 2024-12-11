@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 utils = { path = "../utils" }
+num = { workspace = true }
 itertools = { workspace = true }
 tracing = { workspace = true }
-num = "0.4.3"

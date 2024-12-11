@@ -1,11 +1,10 @@
 [package]
-name = "day_10"
+name = "day_11"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 utils = { path = "../utils" }
+num = { workspace = true }
 itertools = { workspace = true }
-im = { workspace = true }
 tracing = { workspace = true }
-tramp = { workspace = true}

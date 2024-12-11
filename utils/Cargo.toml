@@ -7,7 +7,7 @@ edition = "2021"
 console = "0.15.8"
 err-into = { workspace = true}
 itertools = { workspace = true}
-num = "0.4.3"
+num = { workspace = true }
 thiserror = "1.0.41"
 time = { workspace = true}
 tracing = { workspace = true}
