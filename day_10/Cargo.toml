@@ -1,5 +1,5 @@
 [package]
-name = "day_06"
+name = "day_10"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,3 +8,4 @@ utils = { path = "../utils" }
 itertools = { workspace = true }
 tracing = { workspace = true }
 tramp = { workspace = true}
+im = "15.1.0"

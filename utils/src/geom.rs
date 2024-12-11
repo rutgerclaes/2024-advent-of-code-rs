@@ -1,8 +1,8 @@
-use std::{collections::HashMap, hash::Hash, str::FromStr};
 use itertools::Itertools;
+use std::{collections::HashMap, hash::Hash, iter, str::FromStr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
-pub struct Point<T>{
+pub struct Point<T> {
     pub x: T,
     pub y: T,
 }
@@ -13,21 +13,25 @@ impl<T> Point<T> {
     }
 }
 
-impl<T> From<(T,T)> for Point<T> {
-    fn from((x,y): (T,T)) -> Self {
+impl<T> From<(T, T)> for Point<T> {
+    fn from((x, y): (T, T)) -> Self {
         Point { x, y }
     }
 }
 
-impl <T> Into<(T,T)> for Point<T> {
-    fn into(self) -> (T,T) {
-        (self.x, self.y)
+impl<T> From<Point<T>> for (T, T) {
+    fn from(point: Point<T>) -> (T, T) {
+        (point.x, point.y)
     }
 }
 
 impl<T> Point<T>
 where
-    T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + Copy + num::traits::Zero + num::traits::One,
+    T: std::ops::Add<Output = T>
+        + std::ops::Sub<Output = T>
+        + Copy
+        + num::traits::Zero
+        + num::traits::One,
 {
     // pub fn manhattan_distance(&self, other: &Self) -> T {
     //     (self.x - other.x).abs() + (self.y - other.y).abs()
@@ -38,7 +42,10 @@ where
     //     Point::new(self.x + dx * distance, self.y + dy * distance)
     // }
 
-    pub fn step(&self, direction: &Direction) -> Self where T: num::traits::Zero + num::traits::One + num::traits::Signed {
+    pub fn step(&self, direction: &Direction) -> Self
+    where
+        T: num::traits::Zero + num::traits::One + num::traits::Signed,
+    {
         let (dx, dy) = direction.d();
         Point::new(self.x.add(dx), self.y.add(dy))
     }
@@ -48,9 +55,15 @@ where
     }
 }
 
-impl<T> Default for Point<T> where T: Default {
+impl<T> Default for Point<T>
+where
+    T: Default,
+{
     fn default() -> Self {
-        Point { x: T::default(), y: T::default() }
+        Point {
+            x: T::default(),
+            y: T::default(),
+        }
     }
 }
 
@@ -63,7 +76,6 @@ pub enum Direction {
 }
 
 impl Direction {
-    
     pub fn orientation(&self) -> Orientation {
         match self {
             Direction::Up | Direction::Down => Orientation::Vertical,
@@ -72,11 +84,18 @@ impl Direction {
     }
 
     pub fn is_horizontal(&self) -> bool {
-        matches!( self, Direction::Left | Direction::Right )
+        matches!(self, Direction::Left | Direction::Right)
     }
 
     pub fn is_vertical(&self) -> bool {
-        matches!( self, Direction::Up | Direction::Down )
+        matches!(self, Direction::Up | Direction::Down)
+    }
+
+    pub fn iter() -> impl Iterator<Item = Direction> {
+        iter::once(Direction::Up)
+            .chain(iter::once(Direction::Down))
+            .chain(iter::once(Direction::Left))
+            .chain(iter::once(Direction::Right))
     }
 }
 
@@ -86,8 +105,10 @@ pub enum Orientation {
 }
 
 impl Direction {
-
-    pub fn d<T>( &self ) ->  (T,T) where T: num::traits::Zero + num::traits::One + num::traits::Signed {
+    pub fn d<T>(&self) -> (T, T)
+    where
+        T: num::traits::Zero + num::traits::One + num::traits::Signed,
+    {
         match self {
             Direction::Up => (T::zero(), -T::one()),
             Direction::Down => (T::zero(), T::one()),
@@ -122,7 +143,6 @@ impl Direction {
             Direction::Left => Direction::Up,
         }
     }
-
 }
 
 #[derive(Debug, Clone)]
@@ -148,7 +168,6 @@ impl<T> BBox<T>
 where
     T: std::cmp::PartialOrd + Copy,
 {
-
     pub fn from_point(point: &Point<T>) -> Self {
         BBox {
             min_x: point.x,
@@ -158,11 +177,14 @@ where
         }
     }
 
-    pub fn from_points<I>( points: I) -> Option<Self> where I: IntoIterator<Item = Point<T>> {
+    pub fn from_points<I>(points: I) -> Option<Self>
+    where
+        I: IntoIterator<Item = Point<T>>,
+    {
         let mut points = points.into_iter();
-        
-        points.next().map( |head| {
-            points.fold( BBox::from_point(&head), |mut bbox, point| {
+
+        points.next().map(|head| {
+            points.fold(BBox::from_point(&head), |mut bbox, point| {
                 bbox.extend(&point);
                 bbox
             })
@@ -201,7 +223,6 @@ where
             self.max_y = point.y;
         }
     }
-
 }
 
 #[derive(Debug, Clone)]
@@ -211,7 +232,10 @@ pub struct Grid<T, E> {
     pub max_y: T,
 }
 
-impl<T,E> Default for Grid<T,E> where T: num::traits::Zero {
+impl<T, E> Default for Grid<T, E>
+where
+    T: num::traits::Zero,
+{
     fn default() -> Self {
         Grid {
             locations: HashMap::new(),
@@ -221,9 +245,15 @@ impl<T,E> Default for Grid<T,E> where T: num::traits::Zero {
     }
 }
 
-impl<T,E> Grid<T,E> where T: Hash + Eq + Copy, E: Hash {
-
-    pub fn emtpy() -> Self where T: num::traits::Zero {
+impl<T, E> Grid<T, E>
+where
+    T: Hash + Eq + Copy,
+    E: Hash,
+{
+    pub fn emtpy() -> Self
+    where
+        T: num::traits::Zero,
+    {
         Grid {
             locations: HashMap::new(),
             max_x: T::zero(),
@@ -231,38 +261,82 @@ impl<T,E> Grid<T,E> where T: Hash + Eq + Copy, E: Hash {
         }
     }
 
-    pub fn contains(&self, point: &Point<T>) -> bool where T: std::cmp::PartialOrd + num::traits::Zero {
-        point.x >= T::zero() && point.x <= self.max_x && point.y >= T::zero() && point.y <= self.max_y
+    pub fn contains(&self, point: &Point<T>) -> bool
+    where
+        T: std::cmp::PartialOrd + num::traits::Zero,
+    {
+        point.x >= T::zero()
+            && point.x <= self.max_x
+            && point.y >= T::zero()
+            && point.y <= self.max_y
+    }
+
+    pub fn filter(&self, point: Point<T>) -> Option<Point<T>>
+    where
+        T: std::cmp::PartialOrd + num::traits::Zero,
+    {
+        if self.contains(&point) {
+            Some(point)
+        } else {
+            None
+        }
     }
 
     pub fn get(&self, point: &Point<T>) -> Option<&E> {
         self.locations.get(point)
     }
-}
 
-impl<T,E> FromIterator<(Point<T>, E)> for Grid<T,E> where T: num::traits::Zero + std::cmp::PartialOrd + Hash + Eq + Copy, E: Hash {
-    fn from_iter<I>(iter: I) -> Self where I: IntoIterator<Item = (Point<T>, E)> {
-        iter.into_iter().fold( Grid::emtpy(), |mut grid, (point, elem)| {
-            if grid.max_x < point.x { grid.max_x = point.x; };
-            if grid.max_y < point.y { grid.max_y = point.y; };
-            grid.locations.insert(point, elem);
-            grid
-        })
-        
+    pub fn iter(&self) -> impl Iterator<Item = (&Point<T>, &E)> {
+        self.locations.iter()
+    }
+
+    pub fn neighbors<'a>(&'a self, point: &'a Point<T>) -> impl Iterator<Item = (Point<T>,&'a E)> + '_ where T: num::traits::Zero + num::traits::One + num::traits::Signed + std::cmp::PartialOrd {
+        Direction::iter()
+            .map(|direction| point.step(&direction))
+            .filter_map(move |neighbor| self.filter( neighbor ).and_then( |p| self.get(&p).map(|e| (p, e)) ))
     }
 }
 
-impl<I,T> FromStr for Grid<I,T> where T: Hash + TryFrom<char>, I: From<u16> + num::traits::Zero + Hash + Eq + Copy + PartialOrd {
+impl<T, E> FromIterator<(Point<T>, E)> for Grid<T, E>
+where
+    T: num::traits::Zero + std::cmp::PartialOrd + Hash + Eq + Copy,
+    E: Hash,
+{
+    fn from_iter<I>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = (Point<T>, E)>,
+    {
+        iter.into_iter()
+            .fold(Grid::emtpy(), |mut grid, (point, elem)| {
+                if grid.max_x < point.x {
+                    grid.max_x = point.x;
+                };
+                if grid.max_y < point.y {
+                    grid.max_y = point.y;
+                };
+                grid.locations.insert(point, elem);
+                grid
+            })
+    }
+}
+
+impl<I, T> FromStr for Grid<I, T>
+where
+    T: Hash + TryFrom<char>,
+    I: From<u16> + num::traits::Zero + Hash + Eq + Copy + PartialOrd,
+{
     type Err = <T as TryFrom<char>>::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        s.lines().enumerate().flat_map( |(y, line)| {
-            line.chars().enumerate().map( move |(x, c)| {
-                let point: Point<I> = Point::new((x as u16).into(), (y as u16).into());
-                let elem = T::try_from(c)?;
-                Ok((point, elem))
+        s.lines()
+            .enumerate()
+            .flat_map(|(y, line)| {
+                line.chars().enumerate().map(move |(x, c)| {
+                    let point: Point<I> = Point::new((x as u16).into(), (y as u16).into());
+                    let elem = T::try_from(c)?;
+                    Ok((point, elem))
+                })
             })
-        }).try_collect()
+            .try_collect()
     }
-
 }

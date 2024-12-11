@@ -8,7 +8,9 @@ members = [
   'day_05', 
   'day_06', 
   'day_07', 
-  'day_08', 
+  'day_08',
+  'day_09',
+  'day_10',
   'utils',
 ]
 
@@ -18,3 +20,4 @@ itertools = "0.13.0"
 time = { version = "0.3.36", features = ["macros"] }
 tracing = { version = "0.1.41" }
 tracing-subscriber = { version = "0.3", features = ["local-time", "fmt", "env-filter", "time"] }
+tramp = { version = "0.3" }
