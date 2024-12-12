@@ -50,7 +50,7 @@ fn part_one(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
         match map.get(&next_position) {
             Some(Location::Obstacle) => {
                 tracing::debug!("obstacle at {:?}, turning right", next_position);
-                let direction = direction.turn_right();
+                let direction = direction.rotate_right();
                 rec_call!(take_step(map, position, direction, visited))
             }
             Some(Location::Empty) => {
@@ -105,7 +105,7 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
         }) {
             Some(Location::Obstacle) => {
                 tracing::debug!("obstacle at {:?}, turning right", next_position);
-                let next_direction = direction.turn_right();
+                let next_direction = direction.rotate_right();
                 update_visited(&mut visited, position, direction);
 
                 rec_call!(take_step(
@@ -138,7 +138,7 @@ fn part_two(map: &Map, starting_point: (Direction, Point)) -> Result<usize> {
                         map,
                         Some(next_position),
                         position,
-                        direction.turn_right(),
+                        direction.rotate_right(),
                         visited.clone(),
                         modifications.clone(),
                     ));

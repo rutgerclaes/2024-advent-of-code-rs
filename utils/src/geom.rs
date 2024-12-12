@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::{collections::HashMap, hash::Hash, iter, str::FromStr};
+use std::{collections::HashMap, hash::Hash, iter, ops::{Add, Sub}, str::FromStr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub struct Point<T> {
@@ -13,19 +13,20 @@ impl<T> Point<T>  {
         Point { x, y }
     }
 
+    #[inline]
     pub fn step(&self, direction: &Direction) -> Self
     where
         T: Copy + num::traits::Zero + num::traits::One + num::traits::Signed + std::ops::Add<Output = T>,
     {
-        let (dx, dy) = direction.d();
-        Point::new(self.x.add(dx), self.y.add(dy))
+        self.move_by( direction.d().into() )
     }
 
-    pub fn move_by(&self, dx: T, dy: T) -> Self
+    #[inline]
+    pub fn move_by(&self, vector: Vector<T>) -> Self
     where
         T: Copy + std::ops::Add<Output = T>,
     {
-        Point::new(self.x.add(dx), self.y.add(dy))
+        Point::new(self.x.add(vector.dx), self.y.add(vector.dy))
     }
 
     pub fn neighbours(&self) -> impl Iterator<Item = Self> + '_
@@ -35,19 +36,36 @@ impl<T> Point<T>  {
         Direction::iter().map( |direction| self.step(&direction))
     }
 
-    pub fn all_neighbours(&self) -> impl Iterator<Item = Self> + '_
-    where
-        T: Copy + num::traits::Zero + num::traits::One + num::traits::Signed,
-    {
-            iter::once( self.move_by( T::zero(), -T::one() ))
-            .chain( iter::once( self.move_by( T::one(), -T::one() ) ) )
-            .chain( iter::once( self.move_by( T::one(), T::zero() ) ))
-            .chain( iter::once( self.move_by( T::one(), T::one() )))
-            .chain( iter::once( self.move_by( T::zero(), T::one() )))
-            .chain( iter::once( self.move_by( -T::one(), T::one() )))
-            .chain( iter::once( self.move_by( -T::one(), T::zero() )))
-            .chain( iter::once( self.move_by( -T::one(), -T::one() )))
+}
+
+impl<T> Sub for Point<T> 
+where
+    T: Sub<Output = T>,
+{
+    type Output = Vector<T>;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vector {
+            dx: self.x - rhs.x,
+            dy: self.y - rhs.y,
+        }
     }
+    
+}
+
+impl<T> Sub for &Point<T> 
+where
+    T: Sub<Output = T> + Copy,
+{
+    type Output = Vector<T>;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vector {
+            dx: self.x - rhs.x,
+            dy: self.y - rhs.y,
+        }
+    }
+    
 }
 
 impl<T> From<(T, T)> for Point<T> {
@@ -106,6 +124,58 @@ impl Direction {
     }
 }
 
+pub struct Vector<T> {
+    pub dx: T,
+    pub dy: T,
+}
+
+impl<T> Add for &Vector<T> where T: Add<Output = T> + Copy {
+    type Output = Vector<T>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Vector {
+            dx: self.dx + rhs.dx,
+            dy: self.dy + rhs.dy,
+        }
+    }
+
+}
+
+impl<T> Add for Vector<T> where T: Add<Output = T> + Copy {
+    type Output = Vector<T>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Vector {
+            dx: self.dx + rhs.dx,
+            dy: self.dy + rhs.dy,
+        }
+    }
+
+}
+
+impl<T> Vector<T> {
+    
+    pub fn scale( &self, scalar: T ) -> Vector<T> where T: Copy + std::ops::Mul<Output = T> {
+        Vector {
+            dx: self.dx * scalar,
+            dy: self.dy * scalar,
+        }
+    }
+
+}
+
+impl<T> From<(T, T)> for Vector<T> {
+    fn from((dx, dy): (T, T)) -> Self {
+        Vector { dx, dy }
+    }
+}
+
+impl<T> From<Vector<T>> for (T, T) {
+    fn from(vector: Vector<T>) -> (T, T) {
+        (vector.dx, vector.dy)
+    }
+}
+
 pub enum Orientation {
     Horizontal,
     Vertical,
@@ -133,7 +203,7 @@ impl Direction {
         }
     }
 
-    pub fn turn_left(&self) -> Self {
+    pub fn rotate_left(&self) -> Self {
         match self {
             Direction::Up => Direction::Left,
             Direction::Left => Direction::Down,
@@ -142,13 +212,20 @@ impl Direction {
         }
     }
 
-    pub fn turn_right(&self) -> Self {
+    pub fn rotate_right(&self) -> Self {
         match self {
             Direction::Up => Direction::Right,
             Direction::Right => Direction::Down,
             Direction::Down => Direction::Left,
             Direction::Left => Direction::Up,
         }
+    }
+}
+
+impl<T> From<Direction> for Vector<T> where T: num::traits::Zero + num::traits::One + num::traits::Signed {
+    fn from(value: Direction) -> Self {
+        let d: (T,T) = value.d();
+        Vector { dx: d.0, dy: d.1 }
     }
 }
 

@@ -6,7 +6,7 @@ use std::{
 use itertools::Itertools;
 use tracing::Level;
 use utils::{
-    geom::{self, Direction},
+    geom::{self, Direction, Vector},
     prelude::*,
 };
 
@@ -150,18 +150,17 @@ fn edges(points: &HashSet<Point>) -> usize {
 fn corners(point: &Point, others: &HashSet<Point>) -> usize {
     let outer = Direction::iter()
         .filter(|d| {
-            !others.contains(&point.step(d)) && !others.contains(&point.step(&d.turn_left()))
+            !others.contains(&point.step(d)) && !others.contains(&point.step(&d.rotate_left()))
         })
         .count();
 
     let inner = Direction::iter()
-        .filter(|d| {
-            let right = d.turn_right();
-            let (rx, ry): (i32, i32) = right.d();
-            let (dx, dy): (i32, i32) = d.d();
-            others.contains(&point.step(d))
+        .filter(|&d| {
+            let right = d.rotate_right();
+            let diag: Vector<i32> = Vector::from( d ) + Vector::from( right );
+            others.contains(&point.step(&d))
                 && others.contains(&point.step(&right))
-                && !others.contains(&point.move_by(dx + rx, dy + ry))
+                && !others.contains(&point.move_by(diag ))
         })
         .count();
 
