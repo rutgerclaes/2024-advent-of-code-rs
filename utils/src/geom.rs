@@ -7,9 +7,46 @@ pub struct Point<T> {
     pub y: T,
 }
 
-impl<T> Point<T> {
+impl<T> Point<T>  {
+
     pub fn new(x: T, y: T) -> Self {
         Point { x, y }
+    }
+
+    pub fn step(&self, direction: &Direction) -> Self
+    where
+        T: Copy + num::traits::Zero + num::traits::One + num::traits::Signed + std::ops::Add<Output = T>,
+    {
+        let (dx, dy) = direction.d();
+        Point::new(self.x.add(dx), self.y.add(dy))
+    }
+
+    pub fn move_by(&self, dx: T, dy: T) -> Self
+    where
+        T: Copy + std::ops::Add<Output = T>,
+    {
+        Point::new(self.x.add(dx), self.y.add(dy))
+    }
+
+    pub fn neighbours(&self) -> impl Iterator<Item = Self> + '_
+    where
+        T: Copy + num::traits::Zero + num::traits::One + num::traits::Signed,
+    {
+        Direction::iter().map( |direction| self.step(&direction))
+    }
+
+    pub fn all_neighbours(&self) -> impl Iterator<Item = Self> + '_
+    where
+        T: Copy + num::traits::Zero + num::traits::One + num::traits::Signed,
+    {
+            iter::once( self.move_by( T::zero(), -T::one() ))
+            .chain( iter::once( self.move_by( T::one(), -T::one() ) ) )
+            .chain( iter::once( self.move_by( T::one(), T::zero() ) ))
+            .chain( iter::once( self.move_by( T::one(), T::one() )))
+            .chain( iter::once( self.move_by( T::zero(), T::one() )))
+            .chain( iter::once( self.move_by( -T::one(), T::one() )))
+            .chain( iter::once( self.move_by( -T::one(), T::zero() )))
+            .chain( iter::once( self.move_by( -T::one(), -T::one() )))
     }
 }
 
@@ -22,36 +59,6 @@ impl<T> From<(T, T)> for Point<T> {
 impl<T> From<Point<T>> for (T, T) {
     fn from(point: Point<T>) -> (T, T) {
         (point.x, point.y)
-    }
-}
-
-impl<T> Point<T>
-where
-    T: std::ops::Add<Output = T>
-        + std::ops::Sub<Output = T>
-        + Copy
-        + num::traits::Zero
-        + num::traits::One,
-{
-    // pub fn manhattan_distance(&self, other: &Self) -> T {
-    //     (self.x - other.x).abs() + (self.y - other.y).abs()
-    // }
-
-    // pub fn move_by(&self, direction: &Direction, distance: T) -> Self {
-    //     let (dx, dy): (T,T) = direction.d();
-    //     Point::new(self.x + dx * distance, self.y + dy * distance)
-    // }
-
-    pub fn step(&self, direction: &Direction) -> Self
-    where
-        T: num::traits::Zero + num::traits::One + num::traits::Signed,
-    {
-        let (dx, dy) = direction.d();
-        Point::new(self.x.add(dx), self.y.add(dy))
-    }
-
-    pub fn move_by(&self, dx: T, dy: T) -> Self {
-        Point::new(self.x.add(dx), self.y.add(dy))
     }
 }
 
