@@ -1,0 +1,11 @@
+[package]
+name = "day_14"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+utils = { path = "../utils" }
+itertools = { workspace = true }
+tracing = { workspace = true }
+regex = "1.11.1"
+console = "0.15.8"

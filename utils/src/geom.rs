@@ -24,9 +24,25 @@ impl<T> Point<T>  {
     #[inline]
     pub fn move_by(&self, vector: Vector<T>) -> Self
     where
-        T: Copy + std::ops::Add<Output = T>,
+        T: Copy + Add<Output = T>,
+    {
+        self.add(&vector)
+    }
+
+    #[inline]
+    pub fn add(&self, vector: &Vector<T>) -> Self
+    where
+        T: Copy + Add<Output = T>,
     {
         Point::new(self.x.add(vector.dx), self.y.add(vector.dy))
+    }
+
+    #[inline]
+    pub fn sub(&self, vector: &Vector<T>) -> Self
+    where
+        T: Copy + Sub<Output = T>,
+    {
+        Point::new(self.x.sub( vector.dx ), self.y.sub( vector.dy))
     }
 
     pub fn neighbours(&self) -> impl Iterator<Item = Self> + '_
@@ -124,6 +140,7 @@ impl Direction {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Copy, Hash, Eq)]
 pub struct Vector<T> {
     pub dx: T,
     pub dy: T,
@@ -154,6 +171,10 @@ impl<T> Add for Vector<T> where T: Add<Output = T> + Copy {
 }
 
 impl<T> Vector<T> {
+
+    pub fn new(dx: T, dy: T) -> Self {
+        Vector { dx, dy }
+    }
     
     pub fn scale( &self, scalar: T ) -> Vector<T> where T: Copy + std::ops::Mul<Output = T> {
         Vector {
