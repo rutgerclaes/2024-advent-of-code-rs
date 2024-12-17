@@ -25,8 +25,8 @@ fn main() -> Result<()> {
         .map(|l| l.parse())
         .try_collect()?;
 
-    print_part_1(part_one(&rules, &updates));
-    print_part_2(part_two(&rules, &updates));
+    print_part_1(&part_one(&rules, &updates));
+    print_part_2(&part_two(&rules, &updates));
 
     Ok(())
 }

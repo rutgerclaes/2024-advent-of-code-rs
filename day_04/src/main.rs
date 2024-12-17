@@ -9,8 +9,8 @@ fn main() -> Result<()> {
 
     let input = read_input()?;
     let grid = LetterGrid::new(&input);
-    print_part_1(part_one(&grid));
-    print_part_2(part_two(&grid));
+    print_part_1(&part_one(&grid));
+    print_part_2(&part_two(&grid));
 
     Ok(())
 }

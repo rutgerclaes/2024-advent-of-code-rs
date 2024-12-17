@@ -353,7 +353,6 @@ where
 impl<T, E> Grid<T, E>
 where
     T: Hash + Eq + Copy,
-    E: Hash,
 {
     pub fn emtpy() -> Self
     where
@@ -404,8 +403,7 @@ where
 
 impl<T, E> FromIterator<(Point<T>, E)> for Grid<T, E>
 where
-    T: num::traits::Zero + std::cmp::PartialOrd + Hash + Eq + Copy,
-    E: Hash,
+    T: num::traits::Zero + std::cmp::PartialOrd + Hash + Eq + Copy
 {
     fn from_iter<I>(iter: I) -> Self
     where
@@ -425,20 +423,20 @@ where
     }
 }
 
-impl<I, T> FromStr for Grid<I, T>
+impl<T, E> FromStr for Grid<T, E>
 where
-    T: Hash + TryFrom<char>,
-    I: From<u16> + num::traits::Zero + Hash + Eq + Copy + PartialOrd,
+    E: TryFrom<char>,
+    T: From<u16> + num::traits::Zero + Hash + Eq + Copy + PartialOrd,
 {
-    type Err = <T as TryFrom<char>>::Error;
+    type Err = <E as TryFrom<char>>::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.lines()
             .enumerate()
             .flat_map(|(y, line)| {
                 line.chars().enumerate().map(move |(x, c)| {
-                    let point: Point<I> = Point::new((x as u16).into(), (y as u16).into());
-                    let elem = T::try_from(c)?;
+                    let point: Point<T> = Point::new((x as u16).into(), (y as u16).into());
+                    let elem = E::try_from(c)?;
                     Ok((point, elem))
                 })
             })

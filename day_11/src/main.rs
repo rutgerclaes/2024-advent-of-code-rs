@@ -12,8 +12,8 @@ fn main() -> Result<()> {
         .map(|s| s.parse::<u64>().unwrap())
         .collect::<Vec<u64>>();
 
-    print_part_1(part_one(&stones));
-    print_part_2(part_two(&stones));
+    print_part_1(&part_one(&stones));
+    print_part_2(&part_two(&stones));
 
     Ok(())
 }

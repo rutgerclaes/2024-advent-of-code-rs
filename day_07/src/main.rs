@@ -10,8 +10,8 @@ fn main() -> Result<()> {
 
     let equations: Vec<Equation> = parse_lines()?;
 
-    print_part_1(part_one(&equations));
-    print_part_2(part_two(&equations));
+    print_part_1(&part_one(&equations));
+    print_part_2(&part_two(&equations));
 
     Ok(())
 }

@@ -60,8 +60,8 @@ fn main() -> Result<()> {
         })
         .try_collect()?;
 
-    print_part_1(part_one(position, map.clone(), &instuctions));
-    print_part_2(part_two(position, map, &instuctions));
+    print_part_1(&part_one(position, map.clone(), &instuctions));
+    print_part_2(&part_two(position, map, &instuctions));
 
     Ok(())
 }

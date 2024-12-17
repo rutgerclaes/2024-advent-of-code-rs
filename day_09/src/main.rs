@@ -27,8 +27,8 @@ fn main() -> Result<()> {
         })
         .try_collect()?;
 
-    print_part_1(part_one(&blocks));
-    print_part_2(part_two(&blocks));
+    print_part_1(&part_one(&blocks));
+    print_part_2(&part_two(&blocks));
 
     Ok(())
 }

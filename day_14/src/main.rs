@@ -13,8 +13,8 @@ fn main() -> Result<()> {
 
     let robots: Vec<Robot> = parse_lines()?;
 
-    print_part_1(part_one(&robots));
-    print_part_2(part_two(&robots));
+    print_part_1(&part_one(&robots));
+    print_part_2(&part_two(&robots));
 
     Ok(())
 }

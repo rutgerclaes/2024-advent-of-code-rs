@@ -28,8 +28,8 @@ fn main() -> Result<()> {
     let stations: HashMap<char, Vec<Point<i32>>> = stations.into_iter().into_group_map();
     let bounds = BBox::new(0, max_x as i32, 0, max_y as i32);
 
-    print_part_1(part_one(&stations, &bounds));
-    print_part_2(part_two(&stations, &bounds));
+    print_part_1(&part_one(&stations, &bounds));
+    print_part_2(&part_two(&stations, &bounds));
 
     Ok(())
 }

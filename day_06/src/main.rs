@@ -31,8 +31,8 @@ fn main() -> Result<()> {
     let starting_point = (Direction::Up, location);
     let map: Map = input.parse()?;
 
-    print_part_1(part_one(&map, starting_point));
-    print_part_2(part_two(&map, starting_point));
+    print_part_1(&part_one(&map, starting_point));
+    print_part_2(&part_two(&map, starting_point));
 
     Ok(())
 }

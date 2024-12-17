@@ -25,7 +25,7 @@ pub fn init_tracing() {
         .init();
 }
 
-pub fn print_solution<D, E>(prefix: &str, solution: Result<D, E>)
+pub fn print_solution<D, E>(prefix: &str, solution: &Result<D, E>)
 where
     D: std::fmt::Display,
     E: std::fmt::Display,
@@ -56,7 +56,7 @@ where
     }
 }
 
-pub fn print_part_1<D, E>(solution: Result<D, E>)
+pub fn print_part_1<D, E>(solution: &Result<D, E>)
 where
     D: std::fmt::Display,
     E: std::fmt::Display,
@@ -64,7 +64,7 @@ where
     print_solution("Part 1", solution);
 }
 
-pub fn print_part_2<D, E>(solution: Result<D, E>)
+pub fn print_part_2<D, E>(solution: &Result<D, E>)
 where
     D: std::fmt::Display,
     E: std::fmt::Display,

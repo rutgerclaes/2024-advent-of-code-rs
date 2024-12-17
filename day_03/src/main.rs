@@ -8,8 +8,8 @@ fn main() -> Result<()> {
     init_tracing();
 
     let input = read_input()?;
-    print_part_1(part_one(&input));
-    print_part_2(part_two(&input));
+    print_part_1(&part_one(&input));
+    print_part_2(&part_two(&input));
 
     Ok(())
 }

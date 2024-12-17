@@ -22,8 +22,8 @@ fn main() -> Result<()> {
 
     tracing::debug!("constructed garden with {} regions", garden.iter().count());
 
-    print_part_1(part_one(&garden));
-    print_part_2(part_two(&garden));
+    print_part_1(&part_one(&garden));
+    print_part_2(&part_two(&garden));
 
     Ok(())
 }

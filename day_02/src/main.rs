@@ -9,8 +9,8 @@ fn main() -> Result<()> {
     init_tracing();
 
     let pairs: Vec<Report> = parse_lines()?;
-    print_part_1(part_one(&pairs));
-    print_part_2(part_two(&pairs));
+    print_part_1(&part_one(&pairs));
+    print_part_2(&part_two(&pairs));
 
     Ok(())
 }

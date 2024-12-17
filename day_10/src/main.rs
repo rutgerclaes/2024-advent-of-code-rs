@@ -26,8 +26,8 @@ fn main() -> Result<()> {
         })
         .try_collect()?;
 
-    print_part_1(part_one(&map));
-    print_part_2(part_two(&map));
+    print_part_1(&part_one(&map));
+    print_part_2(&part_two(&map));
 
     Ok(())
 }
