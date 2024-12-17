@@ -29,11 +29,7 @@ fn part_two(stones: &[u64]) -> Result<usize> {
 }
 
 fn simulate(stones: &[u64], iterations: usize) -> usize {
-    let stones = stones
-        .iter()
-        .map(|&s| (s, 1))
-        .into_grouping_map()
-        .sum();
+    let stones = stones.iter().map(|&s| (s, 1)).into_grouping_map().sum();
 
     (0..iterations)
         .fold(stones, |stones, _| {

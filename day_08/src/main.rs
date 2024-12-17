@@ -45,7 +45,7 @@ fn part_one(stations: &HashMap<char, Vec<Point<i32>>>, bbox: &BBox<i32>) -> Resu
                 .filter_map(|a| a.into_iter().collect_tuple())
                 .flat_map(|(a, b)| [(a, b), (b, a)])
                 .filter_map(|(a, b)| {
-                    let p = b.move_by(b-a);
+                    let p = b.move_by(b - a);
                     bbox.filter(p)
                 })
                 .collect::<HashSet<_>>()
@@ -66,7 +66,7 @@ fn part_two(stations: &HashMap<char, Vec<Point<i32>>>, bbox: &BBox<i32>) -> Resu
                 .filter_map(|a| a.into_iter().collect_tuple())
                 .flat_map(|(a, b)| [(a, b), (b, a)])
                 .flat_map(|(&a, &b)| {
-                    std::iter::successors(Some(b), move |p| bbox.filter(p.move_by(b-a)))
+                    std::iter::successors(Some(b), move |p| bbox.filter(p.move_by(b - a)))
                 })
                 .collect::<HashSet<_>>()
         })

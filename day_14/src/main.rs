@@ -96,7 +96,7 @@ fn part_two(robots: &[Robot]) -> Result<u32> {
             render(&pos, boundaries);
             println!("\n\n");
 
-            matches!( term.read_key(), Ok(Key::Enter) )
+            matches!(term.read_key(), Ok(Key::Enter))
         })
         .ok_or_else(|| Error::SolutionNotFound("Could not find the solution".to_string()))
 }

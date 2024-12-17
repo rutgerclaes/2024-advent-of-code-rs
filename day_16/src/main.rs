@@ -1,7 +1,6 @@
-use std::{collections::HashMap, fs::soft_link, hash::Hash, iter, os::linux::raw::stat};
+use std::collections::HashMap;
 
 use im::{vector, HashSet};
-use itertools::{all, Itertools};
 use tracing::Level;
 
 use utils::{geom::Direction, prelude::*};
@@ -20,9 +19,9 @@ fn main() -> Result<()> {
         .ok_or_else(|| parse_error("could not find starting position", ""))?;
 
     let maze: Maze = input.parse()?;
-    let solution = part_one( &maze, &start, &destination);
-    print_part_1(&solution );
-    print_part_2(&part_two(&maze, &start, &destination, Some(solution?) ));
+    let solution = part_one(&maze, &start, &destination);
+    print_part_1(&solution);
+    print_part_2(&part_two(&maze, &start, &destination, Some(solution?)));
 
     Ok(())
 }
@@ -37,8 +36,7 @@ fn find_position(input: &str, needle: char) -> Option<Point> {
 
 #[tracing::instrument(level=Level::INFO,skip(maze,start,destination))]
 fn part_one(maze: &Maze, start: &Point, destination: &Point) -> Result<u64> {
-    let (_, solution ) = search(
-        0,
+    let (_, solution) = search(
         maze,
         destination,
         0,
@@ -46,13 +44,17 @@ fn part_one(maze: &Maze, start: &Point, destination: &Point) -> Result<u64> {
         HashMap::new(),
         None,
     );
-    solution.ok_or_else(|| Error::SolutionNotFound(format!("no solution found")))
+    solution.ok_or_else(|| Error::SolutionNotFound("no solution found".to_owned()))
 }
 
 #[tracing::instrument(level=Level::INFO,skip(maze,start,destination))]
-fn part_two(maze: &Maze, start: &Point, destination: &Point, solution: Option<u64> ) -> Result<usize> {
+fn part_two(
+    maze: &Maze,
+    start: &Point,
+    destination: &Point,
+    solution: Option<u64>,
+) -> Result<usize> {
     let (_, _, points) = search_and_collect(
-        0,
         maze,
         destination,
         0,
@@ -66,8 +68,8 @@ fn part_two(maze: &Maze, start: &Point, destination: &Point, solution: Option<u6
 }
 
 fn min_cost(state: (Point, Direction), destination: &Point) -> u64 {
-    let dx = (state.0.x - destination.x).abs() as u64;
-    let dy = (state.0.y - destination.y).abs() as u64;
+    let dx = (state.0.x - destination.x).unsigned_abs() as u64;
+    let dy = (state.0.y - destination.y).unsigned_abs() as u64;
 
     if dx == 0 || dy == 0 {
         dx + dy
@@ -77,28 +79,20 @@ fn min_cost(state: (Point, Direction), destination: &Point) -> u64 {
 }
 
 fn search(
-    level: usize,
     maze: &Maze,
     destination: &Point,
     cost: u64,
-    state: (&Point,&Direction),
+    state: (&Point, &Direction),
     mut history: HashMap<(Point, Direction), u64>,
     best_solution: Option<u64>,
-) -> (
-    HashMap<(Point, Direction), u64>,
-    Option<u64>,
-) {
+) -> (HashMap<(Point, Direction), u64>, Option<u64>) {
     let (position, orientation) = state;
 
     if position == destination {
         match best_solution {
-            None => {
-                (history, Some(cost))
-            }
-            Some(old) if cost < old => {
-                (history, Some(cost))
-            },
-            _ => (history,best_solution)
+            None => (history, Some(cost)),
+            Some(old) if cost < old => (history, Some(cost)),
+            _ => (history, best_solution),
         }
     } else {
         history.insert((*position, *orientation), cost);
@@ -115,23 +109,22 @@ fn search(
 
         options.into_iter().fold(
             (history, best_solution),
-            |(history, best_solution), ((point,direction), c)| {
+            |(history, best_solution), ((point, direction), c)| {
                 search(
-                    level + 1,
                     maze,
                     destination,
                     cost + c,
-                    (&point,&direction),
+                    (&point, &direction),
                     history,
-                    best_solution
+                    best_solution,
                 )
             },
         )
     }
 }
 
+#[allow(clippy::type_complexity)]
 fn search_and_collect(
-    level: usize,
     maze: &Maze,
     destination: &Point,
     cost: u64,
@@ -160,9 +153,7 @@ fn search_and_collect(
                 let points = points.union(path.into_iter().map(|(p, _)| p).collect());
                 (history, Some(old), points)
             }
-            Some(old) => {
-                (history, Some(old), points)
-            }
+            Some(old) => (history, Some(old), points),
         }
     } else {
         history.insert((*position, *orientation), cost);
@@ -180,12 +171,10 @@ fn search_and_collect(
         options.into_iter().fold(
             (history, bound, points),
             |(history, bound, points), (next, c)| {
-
                 let mut extended_path = path.clone();
                 extended_path.push_back(next);
 
                 search_and_collect(
-                    level + 1,
                     maze,
                     destination,
                     cost + c,

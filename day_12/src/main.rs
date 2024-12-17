@@ -157,10 +157,10 @@ fn corners(point: &Point, others: &HashSet<Point>) -> usize {
     let inner = Direction::iter()
         .filter(|&d| {
             let right = d.rotate_right();
-            let diag: Vector<i32> = Vector::from( d ) + Vector::from( right );
+            let diag: Vector<i32> = Vector::from(d) + Vector::from(right);
             others.contains(&point.step(&d))
                 && others.contains(&point.step(&right))
-                && !others.contains(&point.move_by(diag ))
+                && !others.contains(&point.move_by(diag))
         })
         .count();
 

@@ -153,10 +153,7 @@ fn repartition(
 
 #[tracing::instrument(level=Level::DEBUG,skip(blocks))]
 fn part_two(blocks: &[Block]) -> Result<u64> {
-    let result = tramp(reorder(
-        blocks.len() - 1,
-        blocks.to_vec(),
-    ));
+    let result = tramp(reorder(blocks.len() - 1, blocks.to_vec()));
     Ok(calculate_checksum(&result))
 }
 

@@ -1,5 +1,11 @@
 use itertools::Itertools;
-use std::{collections::HashMap, hash::Hash, iter, ops::{Add, Sub}, str::FromStr};
+use std::{
+    collections::HashMap,
+    hash::Hash,
+    iter,
+    ops::{Add, Sub},
+    str::FromStr,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub struct Point<T> {
@@ -7,8 +13,7 @@ pub struct Point<T> {
     pub y: T,
 }
 
-impl<T> Point<T>  {
-
+impl<T> Point<T> {
     pub fn new(x: T, y: T) -> Self {
         Point { x, y }
     }
@@ -16,9 +21,13 @@ impl<T> Point<T>  {
     #[inline]
     pub fn step(&self, direction: &Direction) -> Self
     where
-        T: Copy + num::traits::Zero + num::traits::One + num::traits::Signed + std::ops::Add<Output = T>,
+        T: Copy
+            + num::traits::Zero
+            + num::traits::One
+            + num::traits::Signed
+            + std::ops::Add<Output = T>,
     {
-        self.move_by( direction.d().into() )
+        self.move_by(direction.d().into())
     }
 
     #[inline]
@@ -42,19 +51,18 @@ impl<T> Point<T>  {
     where
         T: Copy + Sub<Output = T>,
     {
-        Point::new(self.x.sub( vector.dx ), self.y.sub( vector.dy))
+        Point::new(self.x.sub(vector.dx), self.y.sub(vector.dy))
     }
 
     pub fn neighbours(&self) -> impl Iterator<Item = Self> + '_
     where
         T: Copy + num::traits::Zero + num::traits::One + num::traits::Signed,
     {
-        Direction::iter().map( |direction| self.step(&direction))
+        Direction::iter().map(|direction| self.step(&direction))
     }
-
 }
 
-impl<T> Sub for Point<T> 
+impl<T> Sub for Point<T>
 where
     T: Sub<Output = T>,
 {
@@ -66,10 +74,9 @@ where
             dy: self.y - rhs.y,
         }
     }
-    
 }
 
-impl<T> Sub for &Point<T> 
+impl<T> Sub for &Point<T>
 where
     T: Sub<Output = T> + Copy,
 {
@@ -81,7 +88,6 @@ where
             dy: self.y - rhs.y,
         }
     }
-    
 }
 
 impl<T> From<(T, T)> for Point<T> {
@@ -146,7 +152,10 @@ pub struct Vector<T> {
     pub dy: T,
 }
 
-impl<T> Add for &Vector<T> where T: Add<Output = T> + Copy {
+impl<T> Add for &Vector<T>
+where
+    T: Add<Output = T> + Copy,
+{
     type Output = Vector<T>;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -155,10 +164,12 @@ impl<T> Add for &Vector<T> where T: Add<Output = T> + Copy {
             dy: self.dy + rhs.dy,
         }
     }
-
 }
 
-impl<T> Add for Vector<T> where T: Add<Output = T> + Copy {
+impl<T> Add for Vector<T>
+where
+    T: Add<Output = T> + Copy,
+{
     type Output = Vector<T>;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -167,22 +178,22 @@ impl<T> Add for Vector<T> where T: Add<Output = T> + Copy {
             dy: self.dy + rhs.dy,
         }
     }
-
 }
 
 impl<T> Vector<T> {
-
     pub fn new(dx: T, dy: T) -> Self {
         Vector { dx, dy }
     }
-    
-    pub fn scale( &self, scalar: T ) -> Vector<T> where T: Copy + std::ops::Mul<Output = T> {
+
+    pub fn scale(&self, scalar: T) -> Vector<T>
+    where
+        T: Copy + std::ops::Mul<Output = T>,
+    {
         Vector {
             dx: self.dx * scalar,
             dy: self.dy * scalar,
         }
     }
-
 }
 
 impl<T> From<(T, T)> for Vector<T> {
@@ -243,9 +254,12 @@ impl Direction {
     }
 }
 
-impl<T> From<Direction> for Vector<T> where T: num::traits::Zero + num::traits::One + num::traits::Signed {
+impl<T> From<Direction> for Vector<T>
+where
+    T: num::traits::Zero + num::traits::One + num::traits::Signed,
+{
     fn from(value: Direction) -> Self {
-        let d: (T,T) = value.d();
+        let d: (T, T) = value.d();
         Vector { dx: d.0, dy: d.1 }
     }
 }
@@ -394,16 +408,25 @@ where
         self.locations.iter()
     }
 
-    pub fn neighbors<'a>(&'a self, point: &'a Point<T>) -> impl Iterator<Item = (Point<T>,&'a E)> + '_ where T: num::traits::Zero + num::traits::One + num::traits::Signed + std::cmp::PartialOrd {
+    pub fn neighbors<'a>(
+        &'a self,
+        point: &'a Point<T>,
+    ) -> impl Iterator<Item = (Point<T>, &'a E)> + 'a
+    where
+        T: num::traits::Zero + num::traits::One + num::traits::Signed + std::cmp::PartialOrd,
+    {
         Direction::iter()
             .map(|direction| point.step(&direction))
-            .filter_map(move |neighbor| self.filter( neighbor ).and_then( |p| self.get(&p).map(|e| (p, e)) ))
+            .filter_map(move |neighbor| {
+                self.filter(neighbor)
+                    .and_then(|p| self.get(&p).map(|e| (p, e)))
+            })
     }
 }
 
 impl<T, E> FromIterator<(Point<T>, E)> for Grid<T, E>
 where
-    T: num::traits::Zero + std::cmp::PartialOrd + Hash + Eq + Copy
+    T: num::traits::Zero + std::cmp::PartialOrd + Hash + Eq + Copy,
 {
     fn from_iter<I>(iter: I) -> Self
     where
