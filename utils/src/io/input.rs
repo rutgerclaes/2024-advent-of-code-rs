@@ -9,7 +9,7 @@ use std::{
 
 pub fn read_input() -> StdResult<String, io::Error> {
     let input = match std::env::args().nth(1) {
-        Some(file) if file != "-" => {
+        Some(file) if !file.starts_with('-') => {
             tracing::debug!(file = file, "Reading input from file");
             std::fs::read_to_string(file).err_into()
         }

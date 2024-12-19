@@ -8,6 +8,7 @@ console = "0.15.8"
 err-into = { workspace = true}
 itertools = { workspace = true}
 num = { workspace = true }
+pico-args = "0.5.0"
 thiserror = "1.0.41"
 time = { workspace = true}
 tracing = { workspace = true}
