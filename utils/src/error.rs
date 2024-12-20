@@ -1,3 +1,5 @@
+use std::num::TryFromIntError;
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -21,5 +23,14 @@ pub type Result<T> = std::result::Result<T, Error>;
 impl From<std::num::ParseIntError> for Error {
     fn from(value: std::num::ParseIntError) -> Self {
         Error::Parse("error parsing integer".to_string(), Some(Box::new(value)))
+    }
+}
+
+impl From<TryFromIntError> for Error {
+    fn from(value: TryFromIntError) -> Self {
+        Error::Parse(
+            "error converting integer".to_string(),
+            Some(Box::new(value)),
+        )
     }
 }

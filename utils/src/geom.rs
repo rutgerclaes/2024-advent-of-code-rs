@@ -1,11 +1,26 @@
 use itertools::Itertools;
 use std::{
     collections::HashMap,
+    fmt::Debug,
     hash::Hash,
     iter,
     ops::{Add, Sub},
     str::FromStr,
 };
+
+use crate::error::Error;
+
+pub fn find_position<T>(input: &str, needle: char) -> Option<Point<T>>
+where
+    T: TryFrom<usize>,
+    <T as TryFrom<usize>>::Error: Debug,
+{
+    input.lines().enumerate().find_map(|(y, l)| {
+        l.chars()
+            .position(|c| c == needle)
+            .map(|x| Point::new(x.try_into().unwrap(), y.try_into().unwrap()))
+    })
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub struct Point<T> {
@@ -342,6 +357,65 @@ where
             self.max_y = point.y;
         }
     }
+
+    pub fn y_iter(&self) -> impl Iterator<Item = T> + '_
+    where
+        T: num::traits::Zero
+            + num::traits::One
+            + Add<Output = T>
+            + std::cmp::PartialOrd
+            + Copy
+            + 'static,
+    {
+        let max = self.max_y;
+        iter::successors(Some(T::zero()), |i| Some(i.add(T::one()))).take_while(move |&y| y <= max)
+    }
+
+    pub fn x_iter(&self) -> impl Iterator<Item = T> + '_
+    where
+        T: num::traits::Zero
+            + num::traits::One
+            + Add<Output = T>
+            + std::cmp::PartialOrd
+            + Copy
+            + 'static,
+    {
+        let max = self.max_x;
+        iter::successors(Some(T::zero()), |i| Some(i.add(T::one()))).take_while(move |&x| x <= max)
+    }
+
+    pub fn rows(&self) -> impl Iterator<Item = impl Iterator<Item = Point<T>> + '_>
+    where
+        T: num::traits::Zero
+            + num::traits::One
+            + Add<Output = T>
+            + std::cmp::PartialOrd
+            + Copy
+            + 'static,
+    {
+        self.y_iter()
+            .map(move |y| self.x_iter().map(move |x| Point::new(x, y)))
+    }
+
+    pub fn render<F>(&self, f: F) -> String
+    where
+        F: Fn(&Point<T>) -> char,
+        T: num::traits::Zero
+            + num::traits::One
+            + Add<Output = T>
+            + std::cmp::PartialOrd
+            + Copy
+            + 'static,
+    {
+        self.y_iter()
+            .map(|y| {
+                self.x_iter()
+                    .map(|x| f(&Point::new(x, y)))
+                    .collect::<String>()
+            })
+            .collect::<Vec<String>>()
+            .join("\n")
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -422,6 +496,13 @@ where
                     .and_then(|p| self.get(&p).map(|e| (p, e)))
             })
     }
+
+    pub fn bbox(&self) -> BBox<T>
+    where
+        T: std::cmp::PartialOrd + Copy + num::traits::Zero,
+    {
+        BBox::new(T::zero(), self.max_x, T::zero(), self.max_y)
+    }
 }
 
 impl<T, E> FromIterator<(Point<T>, E)> for Grid<T, E>
@@ -449,16 +530,17 @@ where
 impl<T, E> FromStr for Grid<T, E>
 where
     E: TryFrom<char>,
-    T: From<u16> + num::traits::Zero + Hash + Eq + Copy + PartialOrd,
+    T: TryFrom<usize> + num::traits::Zero + Hash + Eq + Copy + PartialOrd,
+    Error: From<<E as TryFrom<char>>::Error> + From<<T as TryFrom<usize>>::Error>,
 {
-    type Err = <E as TryFrom<char>>::Error;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.lines()
             .enumerate()
             .flat_map(|(y, line)| {
                 line.chars().enumerate().map(move |(x, c)| {
-                    let point: Point<T> = Point::new((x as u16).into(), (y as u16).into());
+                    let point: Point<T> = Point::new(x.try_into()?, y.try_into()?);
                     let elem = E::try_from(c)?;
                     Ok((point, elem))
                 })

@@ -3,7 +3,10 @@ use std::collections::HashMap;
 use im::{vector, HashSet};
 use tracing::Level;
 
-use utils::{geom::Direction, prelude::*};
+use utils::{
+    geom::{find_position, Direction},
+    prelude::*,
+};
 
 type Point = utils::geom::Point<i32>;
 type Maze = utils::geom::Grid<i32, Element>;
@@ -24,14 +27,6 @@ fn main() -> Result<()> {
     print_part_2(&part_two(&maze, &start, &destination, Some(solution?)));
 
     Ok(())
-}
-
-fn find_position(input: &str, needle: char) -> Option<Point> {
-    input.lines().enumerate().find_map(|(y, l)| {
-        l.chars()
-            .position(|c| c == needle)
-            .map(|x| Point::new(x as i32, y as i32))
-    })
 }
 
 #[tracing::instrument(level=Level::INFO,skip(maze,start,destination))]
